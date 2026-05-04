@@ -376,7 +376,14 @@ const KEY_MODULES   = 'vpl-modules-v1';
 const KEY_EXPANDED  = 'vpl-expanded-v1';
 const KEY_UPDATED   = 'vpl-updated-v1';
 const TOTAL         = 10;
-
+const ALLOWED_MODULES = [
+  "Innovative Werkstoffe",
+  "Digitaltechnik und Rechnerarchitekturen",
+  "Nachhaltigkeitsmarketing",
+  "Operatives Controlling",
+  "Systemanalyse und Qualitative Entscheidungstheorie",
+  "Thermodynamik und Fluidmechanik"
+];
 const COLORS = ['#4f8ef7','#34d399','#f59e0b','#a78bfa','#f97316','#ec4899','#06b6d4','#10b981','#e11d48','#84cc16'];
 const DAYS   = ['So','Mo','Di','Mi','Do','Fr','Sa'];
 
@@ -431,7 +438,9 @@ function parseICS(text) {
   }
 
   let colorIdx = 0;
-  return Array.from(moduleMap.entries()).map(([name, sessions]) => ({
+  return Array.from(moduleMap.entries())
+  .filter(([name]) => ALLOWED_MODULES.includes(name))
+  .map(([name, sessions]) => ({
     id:       name.replace(/[^a-z0-9]/gi, '-').toLowerCase(),
     name,
     kuerzel:  kuerzel(name),

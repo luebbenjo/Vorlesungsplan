@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="Vorlesung">
+  <meta name="theme-color" content="#0d1117">
+  <title>Vorlesungsplan 24DNE2-4</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+```
+body {
+  background: #0d1117;
+  color: #e6edf3;
+  font-family: 'DM Sans', 'Segoe UI', sans-serif;
+  min-height: 100vh;
+  padding-bottom: 80px;
+  -webkit-font-smoothing: antialiased;
+}
+
+#loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  color: #8b949e;
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.spinner {
+  width: 28px; height: 28px;
+  border: 2px solid #21262d;
+  border-top-color: #4f8ef7;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.sticky-header {
+  background: rgba(13, 17, 23, 0.92);
+  border-bottom: 1px solid #21262d;
+  padding: calc(env(safe-area-inset-top, 0px) + 20px) 20px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.header-inner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.header-top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.header-label {
+  font-size: 10px;
+  color: #8b949e;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+  font-family: 'DM Mono', monospace;
+}
+
+.header-title { font-size: 20px; font-weight: 600; }
+
+.stats { display: flex; gap: 24px; }
+
+.stat { text-align: center; }
+.stat-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1;
+}
+.stat-lbl {
+  font-size: 10px;
+  color: #8b949e;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+.global-progress {
+  height: 4px;
+  border-radius: 2px;
+  background: #21262d;
+  overflow: hidden;
+  margin-top: 14px;
+}
+.global-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4f8ef7, #a78bfa);
+  border-radius: 2px;
+  transition: width 0.35s ease;
+}
+
+.grid {
+  max-width: 900px;
+  margin: 20px auto 0;
+  padding: 0 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(268px, 1fr));
+  gap: 12px;
+}
+
+.card {
+  background: #161b22;
+  border: 1px solid #21262d;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.card:hover { border-color: #2d333b; }
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+.card-header:hover { background: rgba(255,255,255,0.025); }
+.card-header:active { background: rgba(255,255,255,0.04); }
+
+.avatar {
+  width: 36px; height: 36px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.card-info { flex: 1; min-width: 0; }
+
+.card-name {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #e6edf3;
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-progress-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 7px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: #21262d;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.35s ease;
+}
+
+.progress-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  flex-shrink: 0;
+}
+
+.chevron {
+  color: #484f58;
+  font-size: 11px;
+  flex-shrink: 0;
+  transition: transform 0.2s;
+  display: inline-block;
+}
+
+.sessions { border-top: 1px solid #21262d; }
+
+.session-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border-bottom: 1px solid #1c2128;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s, opacity 0.2s;
+}
+.session-row:hover { background: rgba(255,255,255,0.025); }
+.session-row:active { background: rgba(255,255,255,0.04); }
+.session-row.done { opacity: 0.38; }
+.session-row:last-child { border-bottom: none; }
+
+.checkbox {
+  width: 17px; height: 17px;
+  border-radius: 5px;
+  border: 2px solid #30363d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #0d1117;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+
+.session-date {
+  flex: 1;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: #c9d1d9;
+}
+.session-row.done .session-date {
+  text-decoration: line-through;
+  color: #8b949e;
+}
+
+.session-time {
+  font-size: 10px;
+  color: #484f58;
+  font-family: 'DM Mono', monospace;
+  flex-shrink: 0;
+}
+
+.unplanned-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 16px;
+  border-top: 1px solid #1c2128;
+}
+
+.unplanned-box {
+  width: 17px; height: 17px;
+  border-radius: 5px;
+  border: 2px dashed #21262d;
+  flex-shrink: 0;
+}
+
+.unplanned-label {
+  font-size: 11px;
+  color: #484f58;
+  font-style: italic;
+}
+
+.footer {
+  max-width: 900px;
+  margin: 20px auto 0;
+  padding: 0 16px;
+  text-align: center;
+}
+
+.refresh-btn {
+  background: #161b22;
+  border: 1px solid #21262d;
+  color: #8b949e;
+  padding: 9px 20px;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.15s;
+}
+.refresh-btn:hover { border-color: #30363d; color: #c9d1d9; }
+.refresh-btn:active { background: #1c2128; }
+.refresh-btn:disabled { opacity: 0.5; cursor: default; }
+
+.footer-meta {
+  font-size: 10px;
+  color: #484f58;
+  font-family: 'DM Mono', monospace;
+  margin-top: 8px;
+}
+
+.last-updated {
+  font-size: 10px;
+  color: #484f58;
+  font-family: 'DM Mono', monospace;
+  margin-top: 4px;
+}
+
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  color: #8b949e;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  gap: 10px;
+  padding: 24px;
+  text-align: center;
+}
+```
+
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <div id="loading">
+    <div class="spinner"></div>
+    <div>Stundenplan wird geladen…</div>
+  </div>
+</div>
+
+<script>
+// ─── PWA MANIFEST (via Blob URL) ─────────────────────────────────────────────
+(function () {
+  const icon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+    <rect width="512" height="512" rx="110" fill="#161b22"/>
+    <rect x="120" y="130" width="272" height="30" rx="6" fill="#4f8ef7"/>
+    <rect x="120" y="190" width="200" height="22" rx="5" fill="#21262d"/>
+    <rect x="120" y="230" width="240" height="22" rx="5" fill="#21262d"/>
+    <rect x="120" y="270" width="180" height="22" rx="5" fill="#21262d"/>
+    <rect x="120" y="320" width="272" height="30" rx="6" fill="#a78bfa"/>
+    <rect x="120" y="380" width="210" height="22" rx="5" fill="#21262d"/>
+  </svg>`;
+
+  const manifest = {
+    name: "Vorlesungsplan 24DNE2-4",
+    short_name: "Vorlesung",
+    description: "Vorlesungsübersicht mit Fortschrittstracking",
+    start_url: "./",
+    display: "standalone",
+    orientation: "portrait-primary",
+    background_color: "#0d1117",
+    theme_color: "#0d1117",
+    icons: [{
+      src: "data:image/svg+xml," + encodeURIComponent(icon),
+      sizes: "512x512",
+      type: "image/svg+xml",
+      purpose: "any maskable"
+    }]
+  };
+
+  const blob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+  const link = document.createElement('link');
+  link.rel = 'manifest';
+  link.href = URL.createObjectURL(blob);
+  document.head.appendChild(link);
+})();
+
+// ─── CONSTANTS ───────────────────────────────────────────────────────────────
+const ICS_URL       = 'https://sked.lin.hs-osnabrueck.de/sked/grp/24DNE2-4.ics';
+const CORS_PROXY    = 'https://corsproxy.io/?';
+const KEY_CHECKED   = 'vpl-checked-v1';
+const KEY_MODULES   = 'vpl-modules-v1';
+const KEY_EXPANDED  = 'vpl-expanded-v1';
+const KEY_UPDATED   = 'vpl-updated-v1';
+const TOTAL         = 10;
+
+const COLORS = ['#4f8ef7','#34d399','#f59e0b','#a78bfa','#f97316','#ec4899','#06b6d4','#10b981','#e11d48','#84cc16'];
+const DAYS   = ['So','Mo','Di','Mi','Do','Fr','Sa'];
+
+// ─── ICS PARSER ──────────────────────────────────────────────────────────────
+function parseICS(text) {
+  // Unfold lines (RFC 5545: continuation lines start with space/tab)
+  text = text.replace(/\r\n[ \t]/g, '').replace(/\r\n/g, '\n');
+
+  const events = [];
+  const blocks = text.split('BEGIN:VEVENT');
+
+  for (let i = 1; i < blocks.length; i++) {
+    const block = blocks[i];
+
+    const get = (key) => {
+      const m = block.match(new RegExp('^' + key + '[^:\n]*:(.+)$', 'm'));
+      return m ? m[1].trim() : '';
+    };
+
+    const uid     = get('UID');
+    const summary = get('SUMMARY').replace(/\\,/g, ',');
+
+    const dtStart = block.match(/^DTSTART[^:\n]*:(\d{8}T\d{6})/m);
+    const dtEnd   = block.match(/^DTEND[^:\n]*:(\d{8}T\d{6})/m);
+    if (!dtStart || !summary || !uid) continue;
+
+    const parseTS = (s) => ({
+      y:  +s.substr(0,4), mo: +s.substr(4,2)-1,
+      d:  +s.substr(6,2), h:  +s.substr(9,2), mi: +s.substr(11,2)
+    });
+
+    const s = parseTS(dtStart[1]);
+    const e = dtEnd ? parseTS(dtEnd[1]) : null;
+
+    const date = new Date(s.y, s.mo, s.d);
+    const p = (n) => String(n).padStart(2,'0');
+
+    const dateStr = `${DAYS[date.getDay()]}, ${p(s.d)}.${p(s.mo+1)}.${String(s.y).slice(2)}`;
+    const timeStr = e
+      ? `${p(s.h)}:${p(s.mi)}–${p(e.h)}:${p(e.mi)}`
+      : `${p(s.h)}:${p(s.mi)}`;
+
+    events.push({ uid, summary, sortKey: dtStart[1], dateStr, timeStr });
+  }
+
+  events.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+
+  const moduleMap = new Map();
+  for (const ev of events) {
+    if (!moduleMap.has(ev.summary)) moduleMap.set(ev.summary, []);
+    moduleMap.get(ev.summary).push({ uid: ev.uid, dateStr: ev.dateStr, timeStr: ev.timeStr });
+  }
+
+  let colorIdx = 0;
+  return Array.from(moduleMap.entries()).map(([name, sessions]) => ({
+    id:       name.replace(/[^a-z0-9]/gi, '-').toLowerCase(),
+    name,
+    kuerzel:  kuerzel(name),
+    color:    COLORS[colorIdx++ % COLORS.length],
+    sessions,
+  }));
+}
+
+function kuerzel(name) {
+  // Take first letter of first 2+ significant words
+  const words = name.split(/[\s(]+/).filter(w => w.length > 2);
+  if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
+  return name.replace(/[^A-ZÜÄÖ]/g, '').slice(0,2).toUpperCase() || name.slice(0,2).toUpperCase();
+}
+
+function hexRgb(hex) {
+  return [parseInt(hex.slice(1,3),16), parseInt(hex.slice(3,5),16), parseInt(hex.slice(5,7),16)].join(',');
+}
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let checked  = {};
+let modules  = [];
+let expanded = {};
+
+function loadState() {
+  try { checked  = JSON.parse(localStorage.getItem(KEY_CHECKED)  || '{}'); } catch(e) { checked = {}; }
+  try { modules  = JSON.parse(localStorage.getItem(KEY_MODULES)  || '[]'); } catch(e) { modules = []; }
+  try { expanded = JSON.parse(localStorage.getItem(KEY_EXPANDED) || '{}'); } catch(e) { expanded = {}; }
+}
+
+function saveChecked()  { localStorage.setItem(KEY_CHECKED,  JSON.stringify(checked));  }
+function saveModules()  { localStorage.setItem(KEY_MODULES,  JSON.stringify(modules));  }
+function saveExpanded() { localStorage.setItem(KEY_EXPANDED, JSON.stringify(expanded)); }
+
+// ─── FETCH ───────────────────────────────────────────────────────────────────
+async function fetchICS() {
+  // 1. Try direct
+  try {
+    const r = await fetch(ICS_URL, { cache: 'no-cache' });
+    if (r.ok) return await r.text();
+  } catch (_) {}
+
+  // 2. Fallback: CORS proxy
+  try {
+    const r = await fetch(CORS_PROXY + encodeURIComponent(ICS_URL), { cache: 'no-cache' });
+    if (r.ok) return await r.text();
+  } catch (_) {}
+
+  return null;
+}
+
+// ─── ACTIONS ─────────────────────────────────────────────────────────────────
+function toggle(uid) {
+  checked[uid] = !checked[uid];
+  saveChecked();
+  render();
+}
+
+function toggleExpand(id) {
+  // default is open (undefined = open), so toggle to false then back to undefined
+  expanded[id] = expanded[id] === false ? true : false;
+  saveExpanded();
+  render();
+}
+
+async function refreshICS() {
+  const btn = document.getElementById('refresh-btn');
+  if (btn) { btn.textContent = '↻ Wird geladen…'; btn.disabled = true; }
+
+  const text = await fetchICS();
+  if (text) {
+    // Merge new modules while preserving color assignments and order where possible
+    const fresh = parseICS(text);
+    const existing = new Map(modules.map(m => [m.name, m]));
+    modules = fresh.map(m => existing.has(m.name)
+      ? { ...m, color: existing.get(m.name).color } // keep color stable
+      : m
+    );
+    saveModules();
+    localStorage.setItem(KEY_UPDATED, new Date().toLocaleString('de-DE'));
+  } else {
+    if (btn) { btn.textContent = '⚠ Fehler – erneut versuchen'; btn.disabled = false; }
+    return;
+  }
+  render();
+}
+
+// ─── RENDER ──────────────────────────────────────────────────────────────────
+function render() {
+  const totalSessions = modules.reduce((s, m) => s + m.sessions.length, 0);
+  const totalDone     = modules.reduce((s, m) => s + m.sessions.filter(x => checked[x.uid]).length, 0);
+  const globalPct     = totalSessions > 0 ? (totalDone / totalSessions) * 100 : 0;
+  const lastUpdated   = localStorage.getItem(KEY_UPDATED) || '–';
+
+  document.getElementById('app').innerHTML = `
+    <!-- ── HEADER ── -->
+    <div class="sticky-header">
+      <div class="header-inner">
+        <div class="header-top">
+          <div>
+            <div class="header-label">24DNE2-4 · SS 2026</div>
+            <h1 class="header-title">Vorlesungsübersicht</h1>
+          </div>
+          <div class="stats">
+            <div class="stat">
+              <div class="stat-val">${totalDone}</div>
+              <div class="stat-lbl">Abgehakt</div>
+            </div>
+            <div class="stat">
+              <div class="stat-val" style="color:#8b949e">${totalSessions - totalDone}</div>
+              <div class="stat-lbl">Offen</div>
+            </div>
+          </div>
+        </div>
+        <div class="global-progress">
+          <div class="global-progress-fill" style="width:${globalPct}%"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── CARDS ── -->
+    <div class="grid">
+      ${modules.map(mod => {
+        const done   = mod.sessions.filter(s => checked[s.uid]).length;
+        const pct    = Math.min((done / TOTAL) * 100, 100);
+        const isOpen = expanded[mod.id] !== false;
+        const rgb    = hexRgb(mod.color);
+        const unplanned = Math.max(0, TOTAL - mod.sessions.length);
+
+        return `
+        <div class="card">
+          <div class="card-header" onclick="toggleExpand('${mod.id}')">
+            <div class="avatar" style="background:rgba(${rgb},0.15);border:1px solid rgba(${rgb},0.3);color:${mod.color}">
+              ${mod.kuerzel}
+            </div>
+            <div class="card-info">
+              <div class="card-name">${mod.name}</div>
+              <div class="card-progress-row">
+                <div class="progress-bar">
+                  <div class="progress-fill" style="width:${pct}%;background:${mod.color}"></div>
+                </div>
+                <span class="progress-label" style="color:${done>=TOTAL ? mod.color : '#8b949e'}">${done}/${TOTAL}</span>
+              </div>
+            </div>
+            <span class="chevron" style="transform:rotate(${isOpen ? 90 : 0}deg)">▶</span>
+          </div>
+
+          ${isOpen ? `
+          <div class="sessions">
+            ${mod.sessions.map(s => {
+              const d = !!checked[s.uid];
+              return `
+              <div class="session-row${d ? ' done' : ''}" onclick="toggle('${s.uid}')">
+                <div class="checkbox" style="${d ? `background:${mod.color};border-color:${mod.color}` : ''}">
+                  ${d ? '✓' : ''}
+                </div>
+                <span class="session-date">${s.dateStr}</span>
+                <span class="session-time">${s.timeStr}</span>
+              </div>`;
+            }).join('')}
+            ${unplanned > 0 ? `
+            <div class="unplanned-row">
+              <div class="unplanned-box"></div>
+              <span class="unplanned-label">+${unplanned} noch nicht geplant</span>
+            </div>` : ''}
+          </div>` : ''}
+        </div>`;
+      }).join('')}
+    </div>
+
+    <!-- ── FOOTER ── -->
+    <div class="footer">
+      <button class="refresh-btn" id="refresh-btn" onclick="refreshICS()">
+        ↻ Stundenplan aktualisieren
+      </button>
+      <div class="footer-meta">${modules.length} Module · ${totalSessions} geplante Vorlesungen</div>
+      <div class="last-updated">Zuletzt aktualisiert: ${lastUpdated}</div>
+    </div>
+  `;
+}
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+async function init() {
+  loadState();
+
+  // Render from cache immediately if available
+  if (modules.length > 0) render();
+
+  // Then fetch fresh
+  const text = await fetchICS();
+  if (text) {
+    const fresh = parseICS(text);
+    // Preserve existing color assignments (stable by name)
+    const existingColors = new Map(modules.map(m => [m.name, m.color]));
+    modules = fresh.map(m => ({
+      ...m,
+      color: existingColors.has(m.name) ? existingColors.get(m.name) : m.color
+    }));
+    saveModules();
+    localStorage.setItem(KEY_UPDATED, new Date().toLocaleString('de-DE'));
+    render();
+  } else if (modules.length === 0) {
+    document.getElementById('app').innerHTML = `
+      <div class="error-state">
+        <div style="font-size:32px">⚠</div>
+        <div>Stundenplan konnte nicht geladen werden.</div>
+        <div style="color:#484f58;font-size:11px">Prüfe deine Internetverbindung.</div>
+        <button class="refresh-btn" onclick="init()" style="margin-top:12px">Erneut versuchen</button>
+      </div>`;
+  }
+}
+
+init();
+</script>
+
+</body>
+</html>
